@@ -18,36 +18,29 @@ and a timing only counts if both languages print the same checksum.
 | `montecarlo` | Asian option, 64-step GBM paths, 1M paths | **2.3× slower** | 2.4× slower |
 | `montecarlo` on the **GPU** (`tree!`) | same kernel, Apple M3 Metal | — | 1.3× faster than 8-core Rust at 1M paths, ≈4× at 4M |
 
-- **Flat numeric loops over arrays** (ring buffer, float math): Bend is at
-  parity with Rust, which is impressive for a pure, affine, proof-checked
-  functional language.
-- **Branchy, stateful code** (the order book, the core of any trading system): 6.5×
-  slower. Every `if` becomes a helper function and every loop threads a
-  record of state.
-- **Parallelism** is trivial to express (`a b = f(x) g(y)`) and scales ~5×
-  on 8 cores, in line with Rust's `std::thread`, but it does not close a
-  single-core gap.
+- **Flat numeric loops** (ring buffer, float math): parity with Rust,
+  impressive for a pure, affine, proof-checked functional language.
+- **Branchy, stateful code** (the order book, the core of any trading
+  system): 6.5× slower.
+- **Parallelism** is trivial to express (`a b = f(x) g(y)`) and scales ~5× on
+  8 cores like Rust's `std::thread`, but doesn't close a single-core gap.
 - **GPU**: one character (`tree(…)` → `tree!(…)`) moves the Monte Carlo
-  pricer onto the M3's GPU. That is Bend's real differentiator.
-- **For trading systems**: no 64-bit integers, no signed integers, no `if`,
-  no mutual recursion. A research language, not something for a
-  latency-critical path today. See [Verdict](#verdict-for-trading-systems).
+  pricer onto the GPU. That is Bend's real differentiator.
 
 ## Methodology
 
 - **One spec, two implementations.** `specs/` holds exact pseudocode,
-  including the order of floating-point operations, so both languages round
+  including floating-point operation order, so both languages round
   identically.
-- **No I/O in the timed region.** Inputs are generated inside the kernel from a
-  shared deterministic RNG (`bend/common.bend`, `rust/src/lib.rs`).
+- **No I/O in the timed region.** Inputs come from a shared deterministic RNG
+  inside the kernel.
 - **Correctness gates timing.** Every run prints a checksum; integer kernels
-  must match exactly, float kernels within 1e-4 relative (in practice they
-  match bit for bit, across languages and thread counts).
-- **Robust timing.** Median of 5 runs after a warm-up, sizes chosen so runs
-  take tens of milliseconds to seconds. `python3 bench/run.py` rebuilds
-  everything, checks every checksum and regenerates `results/`.
-- **Idiomatic, not tuned.** Straightforward code in both languages: no SIMD,
-  no `unsafe`, no hand-optimisation.
+  must match exactly, float kernels within 1e-4 (in practice bit for bit,
+  across languages and thread counts).
+- **Robust timing.** Median of 5 runs after a warm-up. `python3 bench/run.py`
+  rebuilds, verifies and regenerates `results/`.
+- **Idiomatic, not tuned.** No SIMD, no `unsafe`, no hand-optimisation in
+  either language.
 
 ## Results
 
@@ -72,9 +65,7 @@ and a timing only counts if both languages print the same checksum.
 </picture>
 
 Apple M3 (8 cores), macOS, bend 2.0.24 (emits C, compiled by clang 21 `-O3`),
-rustc 1.91.1 (`-C target-cpu=native`, LTO fat, codegen-units=1). In-program
-kernel time, median of 5 runs after 1 warm-up, checksums verified on every
-run.
+rustc 1.91.1 (`-C target-cpu=native`, LTO fat, codegen-units=1).
 
 | Benchmark | N | Rust 1T (ms) | Bend 1T (ms) | Bend/Rust 1T | Rust 8T (ms) | Bend 8T (ms) | Bend/Rust 8T | Checksums |
 |---|---:|---:|---:|---:|---:|---:|---:|---|
@@ -93,116 +84,91 @@ run.
 
 (Bend/Rust < 1 means Bend is faster.)
 
-**GPU** (`bin/montecarlo_gpu_bend`): 103 ms at 1M paths (median of 7 runs)
-and 125–150 ms at 4M paths, against 540–600 ms for Rust on 8 threads at 4M.
-There is a fixed ~100 ms cost per GPU launch, so the GPU only pays off from
-around 1M paths. The GPU result differs from the CPU one by 3e-6 relative
-(Metal uses `fast::cos` and its own `exp`/`log`), within tolerance. Rust has
-no GPU variant: matching it would mean hand-writing Metal or wgpu kernels,
-which is exactly the work Bend removes.
+**GPU** (`bin/montecarlo_gpu_bend`): 103 ms at 1M paths and 125–150 ms at 4M,
+against 540–600 ms for 8-thread Rust at 4M. A fixed ~100 ms launch cost means
+it only pays off from ~1M paths; results match the CPU to 3e-6 (Metal's own
+`cos`/`exp`/`log`). Rust has no GPU variant: that would mean hand-writing
+Metal or wgpu kernels, exactly the work Bend removes.
 
 ## The kernels
 
 The exact pseudocode for each is in `specs/`.
 
-1. **`orderbook`**: a 1024-tick L2 book of aggregated quantity per price
-   level (no per-order FIFO queues) with best bid/ask tracking, limit orders
-   that cross the spread and sweep levels, market orders, and cancels with
-   best-price rescans. Integer-only and
-   sequential. This is the matching-engine / book-building hot path.
-2. **`ringbuf`**: a preallocated 2-D circular buffer (64 symbols × 256 ticks)
-   with O(1) incremental rolling sum and sum of squares, and a fixed-point
-   "value > 1.25 × rolling mean" signal. This is how rolling features are
-   really kept: no allocation, integer math.
+1. **`orderbook`**: 1024-tick L2 book (aggregated quantity per level, no
+   per-order queues) with best bid/ask tracking, limit orders that sweep
+   levels, market orders and cancels. Integer-only, sequential: the
+   matching-engine hot path.
+2. **`ringbuf`**: preallocated 64-symbol × 256-tick circular buffer with O(1)
+   rolling sum / sum of squares and a fixed-point "value > 1.25 × mean"
+   signal. How rolling features are really kept: no allocation, integer math.
 3. **`blackscholes`**: price a European call, then recover its implied vol
-   with 8 Newton steps (A&S normal CDF, f32), as an options market maker does
-   continuously across chains. A fixed binary reduction tree keeps the f32 sum
-   identical for any thread count.
-4. **`montecarlo`**: an arithmetic Asian call priced over 64-step GBM paths
-   with Box–Muller normals. Path-dependent exotics have no closed form, so
-   desks price them by Monte Carlo. Embarrassingly parallel, which is Bend's
-   best case.
+   with 8 Newton steps (f32), as options market makers do across chains. A
+   fixed reduction tree keeps the sum identical for any thread count.
+4. **`montecarlo`**: arithmetic Asian call over 64-step GBM paths
+   (Box–Muller). Path-dependent exotics have no closed form, so desks use
+   Monte Carlo. Embarrassingly parallel: Bend's best case.
 
 ## Analysis
 
-**Order book (6.5× slower).** The Bend version is 417 lines against 149 for
-Rust. With no `if`, every branch becomes a helper def that `match`es a
-`Bool`. With no mutual recursion, every loop is a single self-recursive def
-over a state record, and `while` loops (matching sweeps, best-price rescans)
-become `Nat`-fuelled recursion. The compiler handles this well: records are
-flattened into register arguments, loops become native tail loops, and an
-array access is a mask plus a load. The remaining gap most likely comes
-from the runtime's calling convention. Multi-value returns go through an out-array
-between dozens of small compiled loop functions, and the whole kernel inlines
-into one state machine, so a profiler can't attribute the gap more precisely.
+**Order book (6.5× slower).** 417 lines of Bend against 149 of Rust: with no
+`if`, every branch is a helper def matching a `Bool`, and with no mutual
+recursion every loop is one self-recursive def over a state record. The
+compiler handles this well (records flatten into registers, loops become
+native tail loops, an array access is a mask plus a load). The remaining gap
+most likely comes from the runtime's calling convention: multi-value returns
+go through an out-array between dozens of small compiled loops. The kernel
+inlines into one state machine, so a profiler can't pin it down further.
 
 **Ring buffer (parity).** Bend's `Array` is *typed* as a binary tree, but the
 native runtime stores `Array<U32>` as a flat buffer with O(1) get and set, so
 a tight integer loop over arrays compiles to roughly what Rust does.
 
-**Black-Scholes (Bend 2.4× faster): verified, not fully explained.** This
-result was checked rather than taken at face value:
+**Black-Scholes (Bend 2.4× faster): verified, not fully explained.**
 
-- The checksums are bit-identical (Rust, Bend 1T, Bend 8T) and agree with an
+- Checksums are bit-identical across Rust, Bend 1T and Bend 8T, and match an
   independent float64 Python reference to 2e-7.
-- Counting libm calls in Bend's emitted C gives exactly the spec's 35 `exp`
-  and 17 `log` per option, so no work is skipped.
-- Bend's emitted C, compiled by hand with plain `clang -O3`, reproduces the
-  speed (413 ms at 4M). A hand-written C version of the same spec runs at
-  Rust speed (~900 ms), whether it uses `expf`, double `exp` (1160 ms), or
-  loop invariants hoisted by hand (905 ms).
-- A sampling profile shows Bend spending ~5× fewer samples in its own
-  arithmetic, and fewer in libm, than Rust. The exact codegen reason is not
-  isolated. Read this row as "Bend's C backend did very well on this kernel",
-  not as a general claim that Bend beats Rust at float math.
+- Bend's emitted C makes exactly the spec's 35 `exp` and 17 `log` calls per
+  option, so no work is skipped.
+- That C, compiled by hand with `clang -O3`, reproduces the speed (413 ms at
+  4M); a hand-written C version runs at Rust speed (~900 ms) with `expf`,
+  double `exp` or hand-hoisted invariants alike.
 
-**Monte Carlo (2.3× slower on 1 and 8 cores).** It has the same shape as
-Black-Scholes (pure f32 math, a fork tree, leaf loops), with a 64-step inner
-loop per path and 4 transcendental calls per step. Scaling is healthy in both
-languages (Bend 5.0×, Rust 5.4× on 8 cores), so the single-core gap carries
+The exact codegen reason is not isolated. Read this as "Bend's C backend did
+very well on this kernel", not "Bend beats Rust at float math".
+
+**Monte Carlo (2.3× slower on 1 and 8 cores).** Same shape as Black-Scholes,
+with a 64-step inner loop and 4 transcendental calls per step. Both languages
+scale well (Bend 5.0×, Rust 5.4× on 8 cores), so the single-core gap carries
 over.
-
-**Parallelism.** Writing `a b = tree(lo, half) tree(lo + half, half)` is all
-it takes, and the runtime's fork-join scheduler scaled as well as explicit
-Rust threads.
 
 ### Why the Bend README shows Bend beating C
 
-Bend's own pinned results (`bench/runtime/_pin_/apple_m4_max.txt` in the Bend
-repo) compare against **single-threaded** C. Their C baselines say so in the
-source ("Single-threaded, 1-to-1 with the Bend program"). On one core, Bend
-is slower than C on 15 of their 16 benchmarks, with a median around 1.2×
-slower and outliers at 2.1× (lexer) and 4.4× (hashmap). The only single-core
-win is `tree-matmul`. "Faster than C" in their charts means Bend on 16 cores
-or the GPU against C on one core.
-
-This repo finds the same pattern: parity on flat numeric loops, several times
-slower on branchy, stateful code, and large wins only from parallel hardware
-that single-threaded C doesn't use. The one difference is that Rust here also
-gets 8 threads.
+Bend's own pinned results (`bench/runtime/_pin_/apple_m4_max.txt`) compare
+against **single-threaded** C ("Single-threaded, 1-to-1 with the Bend
+program"). On one core Bend is slower than C on 15 of 16 benchmarks (median
+~1.2×, up to 4.4× on hashmap). "Faster than C" means Bend on 16 cores or the
+GPU against C on one core. This repo finds the same pattern, except that Rust
+here also gets 8 threads.
 
 ## Verdict for trading systems
 
-Bend could fit offline or overnight pricing and risk (Monte Carlo, greeks
-across books), research backtests, and anything embarrassingly parallel you
-would otherwise hand-port to CUDA or Metal. It doesn't fit, yet:
+Bend could fit offline pricing and risk (Monte Carlo, greeks across books),
+research backtests, and anything embarrassingly parallel you would otherwise
+hand-port to CUDA or Metal. Not yet the latency path:
 
-- **No 64-bit or signed integers.** Prices in ticks × quantities overflow u32
-  quickly, and nanosecond timestamps don't fit. Every kernel here had to be
-  designed around wrapping u32/f32. This alone rules it out for production
-  order handling.
-- **The latency path.** The order book, the part latency-sensitive trading cares most about, is
-  6.5× slower, and a runtime with its own event loop, scheduler and heap is
-  not something you want on a tick-to-trade path.
+- **No 64-bit or signed integers.** Ticks × quantities overflow u32 quickly,
+  and nanosecond timestamps don't fit. This alone rules out production order
+  handling.
+- **Latency.** The order book is 6.5× slower, and a runtime with its own
+  event loop, scheduler and heap doesn't belong on a tick-to-trade path.
 - **Ergonomics.** No `if`, no mutual recursion, destructuring only on
-  parameters, affine variables. See `docs/BEND_NOTES.md` for every trap.
+  parameters, affine variables. See `docs/BEND_NOTES.md`.
 
 ## LAWS.bend: does "proof blocks mistakes" hold?
 
-`laws/` contains a proof-friendly model of the matching engine's sweep: the
-opposite side of the book is a list of resting quantities, and an aggressive
-order sweeps it. Four laws are stated and proven
-(`~/.bend/bin/bend laws/PROOF.bend` → `All terms check.`):
+`laws/` models the matching engine's sweep (an aggressive order against a list
+of resting quantities) and proves four laws (`bend laws/PROOF.bend` →
+`All terms check.`):
 
 | Law | Meaning |
 |---|---|
@@ -211,22 +177,16 @@ order sweeps it. Four laws are stated and proven
 | `sweep_conserves_order` | filled + unfilled remainder == submitted quantity |
 | `sweep_conserves_book` | filled + resting volume after == resting volume before (matching never creates or destroys liquidity) |
 
-**It works as advertised on what it covers.** Injecting a bug (reporting the
-level's quantity as filled instead of the amount taken) makes `PROOF.bend`
-fail and print the mismatching terms. The proofs needed hand-written `Nat`
-lemmas (associativity, left-commutativity, `min`/`sub` identities, in
-`laws/lemmas.bend`), because Base ships almost none. Checking is instant.
+**It works as advertised on what it covers:** injecting a bug (counting the
+level's quantity as filled instead of the amount taken) makes the check fail
+with the mismatching terms, and checking is instant. But:
 
-**Caveats:**
-
-- The laws are about a **`Nat` model**, not the benchmarked `U32` code.
-  Proving things about `U32` means reasoning about 32-bit words bit by bit,
-  and `F32` operations are opaque primitives, so **nothing can be proven
-  about the float kernels at all** (Black-Scholes, Monte Carlo).
-- A law only blocks the mistakes it states. The benchmark code itself is
-  validated by cross-language checksums.
-- The proofs are not free: 4 laws needed ~170 lines of proofs and
-  supporting lemmas.
+- The laws cover a **`Nat` model**, not the benchmarked `U32` code. `U32`
+  proofs mean bit-level reasoning, and `F32` ops are opaque, so **nothing can
+  be proven about the float kernels at all**.
+- A law only blocks the mistakes it states.
+- Proofs aren't free: 4 laws needed ~170 lines of proofs and `Nat` lemmas,
+  since Base ships almost none.
 
 ## Build and run
 
@@ -252,18 +212,12 @@ helpers · `laws/` laws and proofs · `results/` raw measurements ·
 
 ## Caveats
 
-- One machine (Apple M3) and no CUDA GPU. Bend's headline GPU numbers are
-  for NVIDIA.
-- The order book is an aggregated L2 book. A production L3 book with
-  per-order queues (price-time priority) would stress allocation and pointer
-  chasing more, which is where Bend was weakest here.
-- The timer has 1 ms resolution. Single-core rows are ≥ 10 ms; the smallest
-  8-thread rows (6–11 ms) are noisier, so use the larger sizes for
-  conclusions.
-- Both languages use deliberately straightforward implementations (no SIMD,
-  no unsafe, no hand-tuning). This compares what you get from a reasonable
-  first implementation, not from expert optimisation.
-- Bend forced u32/f32-only designs. Production trading code in Rust would use i64/f64, which
+- One machine (Apple M3), no CUDA GPU; Bend's headline GPU numbers are for
+  NVIDIA.
+- The order book is aggregated L2. An L3 book with per-order queues would
+  stress allocation and pointer chasing more, where Bend was weakest.
+- 1 ms timer resolution: the smallest 8-thread rows (6–11 ms) are noisy.
+- Bend forced u32/f32-only designs. Production Rust would use i64/f64, which
   changes nothing about Rust's speed but everything about Bend's
   applicability.
 

@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="740" height="360" viewBox="0 0 740 360" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" role="img" aria-label="order book: kernel time, Rust vs Bend, lower is better">
+<rect width="740" height="360" rx="8" fill="#ffffff"/>
+<text x="370.0" y="40" text-anchor="middle" font-size="17" font-weight="700" fill="#1f2328">order book</text>
+<text x="370.0" y="62" text-anchor="middle" font-size="12" fill="#656d76">50M orders · matching engine</text>
+<line x1="266.0" x2="474.0" y1="262" y2="262" stroke="#d0d7de" stroke-width="1"/>
+<path d="M278.0,262.0 V242.9 Q278.0,238.9 282.0,238.9 H358.0 Q362.0,238.9 362.0,242.9 V262.0 Z" fill="#8f8a83"><title>Rust 1 core: 512ms</title></path>
+<text x="320.0" y="230.8953068592058" text-anchor="middle" font-size="13" fill="#1f2328">512ms</text>
+<text x="320.0" y="212.8953068592058" text-anchor="middle" font-size="13" fill="#656d76">1x</text>
+<text x="320.0" y="282" text-anchor="middle" font-size="13" font-weight="400" fill="#1f2328">Rust</text>
+<text x="320.0" y="299" text-anchor="middle" font-size="13" font-weight="400" fill="#1f2328">1 core</text>
+<path d="M378.0,262.0 V116.0 Q378.0,112.0 382.0,112.0 H458.0 Q462.0,112.0 462.0,116.0 V262.0 Z" fill="#6f62b8"><title>Bend 1 core: 3.32s</title></path>
+<text x="420.0" y="104.0" text-anchor="middle" font-size="13" fill="#1f2328">3.32s</text>
+<text x="420.0" y="86.0" text-anchor="middle" font-size="13" fill="#656d76">0.15x</text>
+<text x="420.0" y="282" text-anchor="middle" font-size="13" font-weight="700" fill="#1f2328">Bend</text>
+<text x="420.0" y="299" text-anchor="middle" font-size="13" font-weight="700" fill="#1f2328">1 core</text>
+<text x="370.0" y="338" text-anchor="middle" font-size="12" fill="#656d76">Apple M3 · speed vs Rust 1 core · lower is better</text>
+</svg>

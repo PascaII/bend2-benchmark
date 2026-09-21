@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="740" height="360" viewBox="0 0 740 360" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" role="img" aria-label="monte carlo asian option: kernel time, Rust vs Bend, lower is better">
+<rect width="740" height="360" rx="8" fill="#0d1117"/>
+<text x="370.0" y="40" text-anchor="middle" font-size="17" font-weight="700" fill="#c9d1d9">monte carlo asian option</text>
+<text x="370.0" y="62" text-anchor="middle" font-size="12" fill="#8b949e">1M paths × 64 steps</text>
+<line x1="116.0" x2="624.0" y1="262" y2="262" stroke="#30363d" stroke-width="1"/>
+<path d="M128.0,262.0 V200.1 Q128.0,196.1 132.0,196.1 H208.0 Q212.0,196.1 212.0,200.1 V262.0 Z" fill="#7a7771"><title>Rust 1 core: 708ms</title></path>
+<text x="170.0" y="188.0782122905028" text-anchor="middle" font-size="13" fill="#c9d1d9">708ms</text>
+<text x="170.0" y="170.0782122905028" text-anchor="middle" font-size="13" fill="#8b949e">1x</text>
+<text x="170.0" y="282" text-anchor="middle" font-size="13" font-weight="400" fill="#c9d1d9">Rust</text>
+<text x="170.0" y="299" text-anchor="middle" font-size="13" font-weight="400" fill="#c9d1d9">1 core</text>
+<path d="M228.0,262.0 V253.7 Q228.0,249.7 232.0,249.7 H308.0 Q312.0,249.7 312.0,253.7 V262.0 Z" fill="#7a7771"><title>Rust 8 cores: 132ms</title></path>
+<text x="270.0" y="241.7094972067039" text-anchor="middle" font-size="13" fill="#c9d1d9">132ms</text>
+<text x="270.0" y="223.7094972067039" text-anchor="middle" font-size="13" fill="#7ee787">5.4x</text>
+<text x="270.0" y="282" text-anchor="middle" font-size="13" font-weight="400" fill="#c9d1d9">Rust</text>
+<text x="270.0" y="299" text-anchor="middle" font-size="13" font-weight="400" fill="#c9d1d9">8 cores</text>
+<path d="M328.0,262.0 V116.0 Q328.0,112.0 332.0,112.0 H408.0 Q412.0,112.0 412.0,116.0 V262.0 Z" fill="#9285db"><title>Bend 1 core: 1.61s</title></path>
+<text x="370.0" y="104.0" text-anchor="middle" font-size="13" fill="#c9d1d9">1.61s</text>
+<text x="370.0" y="86.0" text-anchor="middle" font-size="13" fill="#8b949e">0.44x</text>
+<text x="370.0" y="282" text-anchor="middle" font-size="13" font-weight="700" fill="#c9d1d9">Bend</text>
+<text x="370.0" y="299" text-anchor="middle" font-size="13" font-weight="700" fill="#c9d1d9">1 core</text>
+<path d="M428.0,262.0 V236.0 Q428.0,232.0 432.0,232.0 H508.0 Q512.0,232.0 512.0,236.0 V262.0 Z" fill="#9285db"><title>Bend 8 cores: 322ms</title></path>
+<text x="470.0" y="224.01862197392924" text-anchor="middle" font-size="13" fill="#c9d1d9">322ms</text>
+<text x="470.0" y="206.01862197392924" text-anchor="middle" font-size="13" fill="#7ee787">2.2x</text>
+<text x="470.0" y="282" text-anchor="middle" font-size="13" font-weight="700" fill="#c9d1d9">Bend</text>
+<text x="470.0" y="299" text-anchor="middle" font-size="13" font-weight="700" fill="#c9d1d9">8 cores</text>
+<path d="M528.0,262.0 V256.4 Q528.0,252.4 532.0,252.4 H608.0 Q612.0,252.4 612.0,256.4 V262.0 Z" fill="#9285db"><title>Bend GPU: 103ms</title></path>
+<text x="570.0" y="244.4096834264432" text-anchor="middle" font-size="13" fill="#c9d1d9">103ms</text>
+<text x="570.0" y="226.4096834264432" text-anchor="middle" font-size="13" fill="#7ee787">6.9x</text>
+<text x="570.0" y="282" text-anchor="middle" font-size="13" font-weight="700" fill="#c9d1d9">Bend</text>
+<text x="570.0" y="299" text-anchor="middle" font-size="13" font-weight="700" fill="#c9d1d9">GPU</text>
+<text x="370.0" y="338" text-anchor="middle" font-size="12" fill="#8b949e">Apple M3 · speed vs Rust 1 core · lower is better</text>
+</svg>

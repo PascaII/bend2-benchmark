@@ -1,0 +1,661 @@
+{
+  "env": {
+    "bend": "bend 2.0.24",
+    "rustc": "rustc 1.91.1 (ed61e7d7e 2025-11-07)",
+    "clang": "Apple clang version 21.0.0 (clang-2100.3.34.2)",
+    "cpu": "Apple M3",
+    "cores": "8",
+    "os": "macOS-26.6.2-arm64-arm-64bit-Mach-O"
+  },
+  "runs": 5,
+  "rows": [
+    {
+      "bench": "orderbook",
+      "n": 1000000,
+      "lang": "rust",
+      "threads": 1,
+      "checksum": "2474666064",
+      "stable": true,
+      "kernel_ms": 10.0,
+      "wall_ms": 12.4,
+      "kernel_samples": [
+        10.0,
+        10.0,
+        10.0,
+        10.0,
+        10.0
+      ],
+      "verified": true
+    },
+    {
+      "bench": "orderbook",
+      "n": 1000000,
+      "lang": "bend",
+      "threads": 1,
+      "checksum": "2474666064",
+      "stable": true,
+      "kernel_ms": 66.0,
+      "wall_ms": 68.0,
+      "kernel_samples": [
+        66.0,
+        65.0,
+        66.0,
+        66.0,
+        66.0
+      ],
+      "verified": true
+    },
+    {
+      "bench": "orderbook",
+      "n": 10000000,
+      "lang": "rust",
+      "threads": 1,
+      "checksum": "3185207558",
+      "stable": true,
+      "kernel_ms": 103.0,
+      "wall_ms": 106.3,
+      "kernel_samples": [
+        103.0,
+        103.0,
+        104.0,
+        103.0,
+        105.0
+      ],
+      "verified": true
+    },
+    {
+      "bench": "orderbook",
+      "n": 10000000,
+      "lang": "bend",
+      "threads": 1,
+      "checksum": "3185207558",
+      "stable": true,
+      "kernel_ms": 662.0,
+      "wall_ms": 664.9,
+      "kernel_samples": [
+        660.0,
+        662.0,
+        662.0,
+        663.0,
+        663.0
+      ],
+      "verified": true
+    },
+    {
+      "bench": "orderbook",
+      "n": 50000000,
+      "lang": "rust",
+      "threads": 1,
+      "checksum": "3155066171",
+      "stable": true,
+      "kernel_ms": 512.0,
+      "wall_ms": 515.1,
+      "kernel_samples": [
+        530.0,
+        510.0,
+        517.0,
+        511.0,
+        512.0
+      ],
+      "verified": true
+    },
+    {
+      "bench": "orderbook",
+      "n": 50000000,
+      "lang": "bend",
+      "threads": 1,
+      "checksum": "3155066171",
+      "stable": true,
+      "kernel_ms": 3324.0,
+      "wall_ms": 3326.0,
+      "kernel_samples": [
+        3324.0,
+        3304.0,
+        3311.0,
+        3324.0,
+        3383.0
+      ],
+      "verified": true
+    },
+    {
+      "bench": "ringbuf",
+      "n": 10000000,
+      "lang": "rust",
+      "threads": 1,
+      "checksum": "2233430482",
+      "stable": true,
+      "kernel_ms": 13.0,
+      "wall_ms": 15.7,
+      "kernel_samples": [
+        13.0,
+        13.0,
+        13.0,
+        13.0,
+        13.0
+      ],
+      "verified": true
+    },
+    {
+      "bench": "ringbuf",
+      "n": 10000000,
+      "lang": "bend",
+      "threads": 1,
+      "checksum": "2233430482",
+      "stable": true,
+      "kernel_ms": 15.0,
+      "wall_ms": 17.2,
+      "kernel_samples": [
+        21.0,
+        16.0,
+        15.0,
+        15.0,
+        15.0
+      ],
+      "verified": true
+    },
+    {
+      "bench": "ringbuf",
+      "n": 100000000,
+      "lang": "rust",
+      "threads": 1,
+      "checksum": "1985849675",
+      "stable": true,
+      "kernel_ms": 138.0,
+      "wall_ms": 140.8,
+      "kernel_samples": [
+        138.0,
+        138.0,
+        137.0,
+        138.0,
+        138.0
+      ],
+      "verified": true
+    },
+    {
+      "bench": "ringbuf",
+      "n": 100000000,
+      "lang": "bend",
+      "threads": 1,
+      "checksum": "1985849675",
+      "stable": true,
+      "kernel_ms": 149.0,
+      "wall_ms": 152.1,
+      "kernel_samples": [
+        150.0,
+        149.0,
+        149.0,
+        149.0,
+        150.0
+      ],
+      "verified": true
+    },
+    {
+      "bench": "ringbuf",
+      "n": 400000000,
+      "lang": "rust",
+      "threads": 1,
+      "checksum": "3879717039",
+      "stable": true,
+      "kernel_ms": 554.0,
+      "wall_ms": 557.1,
+      "kernel_samples": [
+        553.0,
+        555.0,
+        552.0,
+        556.0,
+        554.0
+      ],
+      "verified": true
+    },
+    {
+      "bench": "ringbuf",
+      "n": 400000000,
+      "lang": "bend",
+      "threads": 1,
+      "checksum": "3879717039",
+      "stable": true,
+      "kernel_ms": 597.0,
+      "wall_ms": 599.7,
+      "kernel_samples": [
+        597.0,
+        597.0,
+        597.0,
+        596.0,
+        597.0
+      ],
+      "verified": true
+    },
+    {
+      "bench": "blackscholes",
+      "n": 262144,
+      "lang": "rust",
+      "threads": 1,
+      "checksum": "3142222",
+      "stable": true,
+      "kernel_ms": 59.0,
+      "wall_ms": 61.2,
+      "kernel_samples": [
+        56.0,
+        59.0,
+        60.0,
+        56.0,
+        59.0
+      ],
+      "verified": true
+    },
+    {
+      "bench": "blackscholes",
+      "n": 262144,
+      "lang": "bend",
+      "threads": 1,
+      "checksum": "3142222",
+      "stable": true,
+      "kernel_ms": 24.0,
+      "wall_ms": 25.8,
+      "kernel_samples": [
+        28.0,
+        23.0,
+        24.0,
+        24.0,
+        24.0
+      ],
+      "verified": true
+    },
+    {
+      "bench": "blackscholes",
+      "n": 262144,
+      "lang": "rust",
+      "threads": 8,
+      "checksum": "3142222",
+      "stable": true,
+      "kernel_ms": 11.0,
+      "wall_ms": 13.0,
+      "kernel_samples": [
+        11.0,
+        11.0,
+        11.0,
+        10.0,
+        12.0
+      ],
+      "verified": true
+    },
+    {
+      "bench": "blackscholes",
+      "n": 262144,
+      "lang": "bend",
+      "threads": 8,
+      "checksum": "3142222",
+      "stable": true,
+      "kernel_ms": 6.0,
+      "wall_ms": 7.7,
+      "kernel_samples": [
+        6.0,
+        5.0,
+        6.0,
+        5.0,
+        6.0
+      ],
+      "verified": true
+    },
+    {
+      "bench": "blackscholes",
+      "n": 1048576,
+      "lang": "rust",
+      "threads": 1,
+      "checksum": "12572370",
+      "stable": true,
+      "kernel_ms": 223.0,
+      "wall_ms": 226.7,
+      "kernel_samples": [
+        223.0,
+        223.0,
+        223.0,
+        240.0,
+        239.0
+      ],
+      "verified": true
+    },
+    {
+      "bench": "blackscholes",
+      "n": 1048576,
+      "lang": "bend",
+      "threads": 1,
+      "checksum": "12572370",
+      "stable": true,
+      "kernel_ms": 94.0,
+      "wall_ms": 96.8,
+      "kernel_samples": [
+        94.0,
+        94.0,
+        95.0,
+        94.0,
+        95.0
+      ],
+      "verified": true
+    },
+    {
+      "bench": "blackscholes",
+      "n": 1048576,
+      "lang": "rust",
+      "threads": 8,
+      "checksum": "12572370",
+      "stable": true,
+      "kernel_ms": 42.0,
+      "wall_ms": 44.0,
+      "kernel_samples": [
+        42.0,
+        42.0,
+        42.0,
+        41.0,
+        40.0
+      ],
+      "verified": true
+    },
+    {
+      "bench": "blackscholes",
+      "n": 1048576,
+      "lang": "bend",
+      "threads": 8,
+      "checksum": "12572370",
+      "stable": true,
+      "kernel_ms": 19.0,
+      "wall_ms": 21.2,
+      "kernel_samples": [
+        20.0,
+        18.0,
+        20.0,
+        19.0,
+        18.0
+      ],
+      "verified": true
+    },
+    {
+      "bench": "blackscholes",
+      "n": 4194304,
+      "lang": "rust",
+      "threads": 1,
+      "checksum": "50302308",
+      "stable": true,
+      "kernel_ms": 899.0,
+      "wall_ms": 902.1,
+      "kernel_samples": [
+        899.0,
+        896.0,
+        896.0,
+        958.0,
+        945.0
+      ],
+      "verified": true
+    },
+    {
+      "bench": "blackscholes",
+      "n": 4194304,
+      "lang": "bend",
+      "threads": 1,
+      "checksum": "50302308",
+      "stable": true,
+      "kernel_ms": 377.0,
+      "wall_ms": 379.9,
+      "kernel_samples": [
+        377.0,
+        378.0,
+        377.0,
+        378.0,
+        377.0
+      ],
+      "verified": true
+    },
+    {
+      "bench": "blackscholes",
+      "n": 4194304,
+      "lang": "rust",
+      "threads": 8,
+      "checksum": "50302308",
+      "stable": true,
+      "kernel_ms": 170.0,
+      "wall_ms": 172.8,
+      "kernel_samples": [
+        170.0,
+        169.0,
+        172.0,
+        171.0,
+        167.0
+      ],
+      "verified": true
+    },
+    {
+      "bench": "blackscholes",
+      "n": 4194304,
+      "lang": "bend",
+      "threads": 8,
+      "checksum": "50302308",
+      "stable": true,
+      "kernel_ms": 81.0,
+      "wall_ms": 84.3,
+      "kernel_samples": [
+        81.0,
+        79.0,
+        84.0,
+        78.0,
+        82.0
+      ],
+      "verified": true
+    },
+    {
+      "bench": "montecarlo",
+      "n": 65536,
+      "lang": "rust",
+      "threads": 1,
+      "checksum": "5.35486",
+      "stable": true,
+      "kernel_ms": 45.0,
+      "wall_ms": 48.8,
+      "kernel_samples": [
+        43.0,
+        45.0,
+        45.0,
+        45.0,
+        46.0
+      ],
+      "verified": true
+    },
+    {
+      "bench": "montecarlo",
+      "n": 65536,
+      "lang": "bend",
+      "threads": 1,
+      "checksum": "5.35486",
+      "stable": true,
+      "kernel_ms": 103.0,
+      "wall_ms": 105.9,
+      "kernel_samples": [
+        103.0,
+        104.0,
+        104.0,
+        103.0,
+        103.0
+      ],
+      "verified": true
+    },
+    {
+      "bench": "montecarlo",
+      "n": 65536,
+      "lang": "rust",
+      "threads": 8,
+      "checksum": "5.35486",
+      "stable": true,
+      "kernel_ms": 9.0,
+      "wall_ms": 11.3,
+      "kernel_samples": [
+        9.0,
+        10.0,
+        9.0,
+        8.0,
+        9.0
+      ],
+      "verified": true
+    },
+    {
+      "bench": "montecarlo",
+      "n": 65536,
+      "lang": "bend",
+      "threads": 8,
+      "checksum": "5.35486",
+      "stable": true,
+      "kernel_ms": 23.0,
+      "wall_ms": 24.8,
+      "kernel_samples": [
+        23.0,
+        23.0,
+        22.0,
+        22.0,
+        24.0
+      ],
+      "verified": true
+    },
+    {
+      "bench": "montecarlo",
+      "n": 262144,
+      "lang": "rust",
+      "threads": 1,
+      "checksum": "5.363397",
+      "stable": true,
+      "kernel_ms": 175.0,
+      "wall_ms": 178.5,
+      "kernel_samples": [
+        178.0,
+        174.0,
+        174.0,
+        175.0,
+        175.0
+      ],
+      "verified": true
+    },
+    {
+      "bench": "montecarlo",
+      "n": 262144,
+      "lang": "bend",
+      "threads": 1,
+      "checksum": "5.363397",
+      "stable": true,
+      "kernel_ms": 407.0,
+      "wall_ms": 411.0,
+      "kernel_samples": [
+        409.0,
+        407.0,
+        406.0,
+        406.0,
+        411.0
+      ],
+      "verified": true
+    },
+    {
+      "bench": "montecarlo",
+      "n": 262144,
+      "lang": "rust",
+      "threads": 8,
+      "checksum": "5.363397",
+      "stable": true,
+      "kernel_ms": 36.0,
+      "wall_ms": 39.0,
+      "kernel_samples": [
+        33.0,
+        40.0,
+        37.0,
+        33.0,
+        36.0
+      ],
+      "verified": true
+    },
+    {
+      "bench": "montecarlo",
+      "n": 262144,
+      "lang": "bend",
+      "threads": 8,
+      "checksum": "5.363397",
+      "stable": true,
+      "kernel_ms": 78.0,
+      "wall_ms": 80.7,
+      "kernel_samples": [
+        82.0,
+        82.0,
+        76.0,
+        78.0,
+        74.0
+      ],
+      "verified": true
+    },
+    {
+      "bench": "montecarlo",
+      "n": 1048576,
+      "lang": "rust",
+      "threads": 1,
+      "checksum": "5.3642964",
+      "stable": true,
+      "kernel_ms": 708.0,
+      "wall_ms": 711.4,
+      "kernel_samples": [
+        709.0,
+        707.0,
+        708.0,
+        708.0,
+        699.0
+      ],
+      "verified": true
+    },
+    {
+      "bench": "montecarlo",
+      "n": 1048576,
+      "lang": "bend",
+      "threads": 1,
+      "checksum": "5.364296",
+      "stable": true,
+      "kernel_ms": 1611.0,
+      "wall_ms": 1613.7,
+      "kernel_samples": [
+        1608.0,
+        1609.0,
+        1611.0,
+        1619.0,
+        1615.0
+      ],
+      "verified": true
+    },
+    {
+      "bench": "montecarlo",
+      "n": 1048576,
+      "lang": "rust",
+      "threads": 8,
+      "checksum": "5.3642964",
+      "stable": true,
+      "kernel_ms": 132.0,
+      "wall_ms": 134.6,
+      "kernel_samples": [
+        138.0,
+        126.0,
+        129.0,
+        132.0,
+        162.0
+      ],
+      "verified": true
+    },
+    {
+      "bench": "montecarlo",
+      "n": 1048576,
+      "lang": "bend",
+      "threads": 8,
+      "checksum": "5.364296",
+      "stable": true,
+      "kernel_ms": 322.0,
+      "wall_ms": 325.3,
+      "kernel_samples": [
+        308.0,
+        349.0,
+        356.0,
+        316.0,
+        322.0
+      ],
+      "verified": true
+    }
+  ]
+}

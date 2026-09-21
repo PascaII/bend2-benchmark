@@ -1,0 +1,8 @@
+rust/target/
+/bin/
+*.c.tmp
+.DS_Store
+
+# local agent instructions (not published)
+AGENTS.md
+CLAUDE.md

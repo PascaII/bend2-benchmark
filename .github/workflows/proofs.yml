@@ -1,0 +1,50 @@
+name: proofs
+
+# Gate: the order book laws must be proven, then re-checked by the Lean kernel.
+# `bend PROOF.bend` fails while any law is open or false.
+# `--safe` additionally translates to BendTT and hands it to a kernel that has a
+# proof in Lean, so a bug in Bend's own checker cannot pass this gate.
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  safe:
+    # Pinned, not `ubuntu-latest`: that label moves to Ubuntu 26 on Oct 19 2026,
+    # and the gate should not change OS under us.
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/cache@v6
+        with:
+          path: ~/.elan
+          key: elan-leanprover-lean4-v4.34.0
+
+      - name: Install Bend
+        run: |
+          curl -fsSL https://bend-lang.com/install.sh | sh
+          echo "$HOME/.bend/bin" >> "$GITHUB_PATH"
+
+      # --safe requires exactly this Lean; other versions are refused.
+      - name: Install Lean 4.34.0
+        run: |
+          curl -sSfL https://elan.lean-lang.org/elan-init.sh \
+            | sh -s -- -y --default-toolchain leanprover/lean4:v4.34.0 --no-modify-path
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+
+      - name: Check the proofs
+        working-directory: laws
+        run: bend PROOF.bend --safe
+
+      # --safe writes this artifact; the guide says to read it, since the
+      # translation itself carries no proof.
+      - name: Upload the BendTT translation
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: PROOF.bendtt
+          path: laws/PROOF.bendtt
+          if-no-files-found: error

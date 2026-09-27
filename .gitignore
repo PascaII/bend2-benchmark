@@ -2,6 +2,7 @@ rust/target/
 /bin/
 *.c.tmp
 .DS_Store
+laws/PROOF.bendtt
 
 # local agent instructions (not published)
 AGENTS.md

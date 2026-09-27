@@ -12,11 +12,13 @@ on:
 
 jobs:
   safe:
-    runs-on: ubuntu-latest
+    # Pinned, not `ubuntu-latest`: that label moves to Ubuntu 26 on Oct 19 2026,
+    # and the gate should not change OS under us.
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/cache@v4
+      - uses: actions/cache@v6
         with:
           path: ~/.elan
           key: elan-leanprover-lean4-v4.34.0
@@ -41,7 +43,7 @@ jobs:
       # translation itself carries no proof.
       - name: Upload the BendTT translation
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: PROOF.bendtt
           path: laws/PROOF.bendtt
